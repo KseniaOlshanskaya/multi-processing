@@ -1,3 +1,7 @@
+from queue import Queue
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
 class Client:
     def __init__(self, name, phone_number, balance):
         self.name = name
@@ -57,16 +61,13 @@ class Client:
                 " Пополните счет и оставайтесь на связи!"
         return woman_voice + "\n"
 
-    def debts_txt(self):
-
-
 
 class ProcessRunner:
     @staticmethod
-    def first_process():
+    def read(indicator, p):
         clients_base = []
         with open("file.txt", "r") as file:
-            for i in range(100000):
+            for i in range(1000000):
                 c = file.readline().strip()
                 phone_number = c[:16]
                 name = c[16:-4]
@@ -78,5 +79,43 @@ class ProcessRunner:
                     balance = int(balance)
                 client = Client(name, phone_number, balance)
                 clients_base.append(client)
+            if indicator == 1:
+                p.first_process(clients_base)
+            elif indicator == 2:
+                q = Queue()
+                for c in clients_base:
+                    q.put(c)
+
+                q.put(None)
+                q.put(None)
+                q.put(None)
+
+                with ThreadPoolExecutor(max_workers=3) as pool:
+                    results = [pool.submit(p.second_process(q))]
+            else:
+                p.third_process(clients_base)
+
+    @staticmethod
+    def first_process(clients_base):
+        for client in clients_base:
+            client.check_balance()
+
+    @staticmethod
+    def second_process(q):
+        for i in range(1000):
+            if q.get() is None:
+                break
+            else:
+                client = q.get()
                 client.check_balance()
-            print(client)
+
+    @staticmethod
+    def third_process(clients_base):
+        pass
+
+
+
+
+
+
+

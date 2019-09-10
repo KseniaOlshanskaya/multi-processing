@@ -1,5 +1,6 @@
 import random
 
+
 with open("file.txt", "w") as file:
     clients_base = []
     list_of_defs = ["875", "840", "826", "898", "971"]
@@ -12,7 +13,7 @@ with open("file.txt", "w") as file:
                     "Нефть", "Попов", "Альба", "Ненси", "Пирс", "Мэнсон", "Кларкс"]
     list_of_phones = []
 
-    for i in range(100000):
+    for i in range(1000000):
         phone_number = "+7-" + random.choice(list_of_defs) \
                        + "-" + str(random.randint(100, 999)) + "-" \
                        + str(random.randint(10, 99)) + "-" + str(random.randint(10, 99))
