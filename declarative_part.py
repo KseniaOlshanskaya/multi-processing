@@ -1,5 +1,6 @@
 from queue import Queue
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 
 class Client:
@@ -44,7 +45,8 @@ class Client:
 
     @staticmethod
     def message1():
-        message = "\nОповещение: \nУважаемый абонент! На Вашем балансе 0 руб. Пополните счет и оставайтесь на связи!"
+        message = "\nОповещение: \nУважаемый абонент! На Вашем балансе 0 руб. " \
+                  "Пополните счет и оставайтесь на связи!"
         return message + "\n"
 
     def message2(self):
@@ -85,11 +87,9 @@ class ProcessRunner:
                 q = Queue()
                 for c in clients_base:
                     q.put(c)
-
                 q.put(None)
                 q.put(None)
                 q.put(None)
-
                 with ThreadPoolExecutor(max_workers=3) as pool:
                     results = [pool.submit(p.second_process(q))]
             else:
@@ -99,10 +99,11 @@ class ProcessRunner:
     def first_process(clients_base):
         for client in clients_base:
             client.check_balance()
+        print(client)
 
     @staticmethod
     def second_process(q):
-        for i in range(1000):
+        for i in range(1000000):
             if q.get() is None:
                 break
             else:
@@ -112,10 +113,3 @@ class ProcessRunner:
     @staticmethod
     def third_process(clients_base):
         pass
-
-
-
-
-
-
-
