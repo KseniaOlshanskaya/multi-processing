@@ -11,6 +11,7 @@ with open("file.txt", "w") as file:
     last_names = ["Приходько", "Хикс", "Штепа", "Красько", "Блэк", "Уайт",
                     "Эпл", "Абенд", "Вивальди", "Бах", "Игрек", "Сириус",
                     "Нефть", "Попов", "Альба", "Ненси", "Пирс", "Мэнсон", "Кларкс"]
+    list_of_rates = [200, 350, 450, 500]
     list_of_phones = []
 
     for i in range(1000000):
@@ -27,4 +28,12 @@ with open("file.txt", "w") as file:
 
         name = random.choice(first_names) + " " + random.choice(last_names)
         balance = random.randint(-1000, 1000)
+        rate = random.choice(list_of_rates)
+        day = str(random.randint(1, 25))
+        month = str(random.randint(1, 12))
+        if len(str(day)) == 1:
+            day = "0" + str(day)
+        if len(str(month)) == 1:
+            month = "0" + str(month)
+        date = day + "." + month + "." + "19"
         print(phone_number + " " + name + " " + str(balance), file=file)

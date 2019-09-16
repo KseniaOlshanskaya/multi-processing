@@ -1,5 +1,6 @@
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
+import time
 import threading
 
 
@@ -38,7 +39,6 @@ class Client:
         elif self.balance == 0:
             return self.__str__() + self.message1()
 
-
     def ok(self):
         self.condition = "OK"
         return "\nОповещение: \nПоложительный баланс" + "\n"
@@ -65,6 +65,12 @@ class Client:
 
 
 class ProcessRunner:
+    def __init__(self):
+        self.start_time = 0
+        self.finish_time = 0
+        self.result_time = 0
+        self.block = threading.RLock()
+
     @staticmethod
     def read(indicator, p):
         clients_base = []
@@ -93,23 +99,36 @@ class ProcessRunner:
                 with ThreadPoolExecutor(max_workers=3) as pool:
                     results = [pool.submit(p.second_process(q))]
             else:
-                p.third_process(clients_base)
+                return clients_base
 
-    @staticmethod
-    def first_process(clients_base):
+    def first_process(self, clients_base):
+        self.start_time = time.time()
         for client in clients_base:
             client.check_balance()
-        print(client)
+        self.finish_time = time.time()
+        self.result_time = self.finish_time - self.start_time
+        print("Первый процесс (последовательно): " + str(self.result_time))
 
-    @staticmethod
-    def second_process(q):
+    def second_process(self, q):
+        self.start_time = time.time()
         for i in range(1000000):
             if q.get() is None:
                 break
             else:
                 client = q.get()
                 client.check_balance()
+        self.finish_time = time.time()
+        self.result_time = self.finish_time - self.start_time
+        print("Второй процесс (параллельно, с очередью): " + str(self.result_time))
 
-    @staticmethod
-    def third_process(clients_base):
-        pass
+    def third_process(self, p):
+        self.start_time = time.time()
+        with threading.RLock():
+            clients_base = p.read(3, p)
+            with ThreadPoolExecutor(max_workers=3) as pool:
+                for i in range(len(clients_base)):
+                    pool.submit(clients_base[i].check_balance())
+
+        self.finish_time = time.time()
+        self.result_time = self.finish_time - self.start_time
+        print("Третий процесс (параллельно, с блокировками): " + str(self.result_time))
