@@ -132,3 +132,4 @@ class ProcessRunner:
         self.finish_time = time.time()
         self.result_time = self.finish_time - self.start_time
         print("Третий процесс (параллельно, с блокировками): " + str(self.result_time))
+
